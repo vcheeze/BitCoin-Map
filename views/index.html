@@ -1,0 +1,261 @@
+<!-- Display more information in order to guide the user -->
+<!-- Display the country name info-->
+<!-- Show error message -->
+<!-- Edit loading page -->
+<!-- Display country name on mouse hover -->
+<!-- Add selection bar or search bar on top -->
+<!-- How to add bitcoin icon to title -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="author" content="Peter Chen">
+	<title>BitCoin Map</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mitr">
+	<link rel="stylesheet" href="css/loader.css">
+	<link rel="stylesheet" href="css/styles.css">
+	<style>
+		svg {
+		  	background: #eee;
+/*		  	position: absolute;*/
+		  	display: block;
+		  	margin: auto;
+		  	margin-top: 45px;
+		}
+
+		.background {
+			fill: none;
+			pointer-events: all;
+		}
+
+		.unit {
+		  	fill: #cdc;
+		  	cursor: pointer;
+		}
+
+		.unit.active {
+			fill: #ffa500;
+		}
+
+		.boundary {
+			fill: none;
+		  	stroke: #eee;
+		  	stroke-width: 1.25px;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+			vector-effect: non-scaling-stroke;
+		}
+
+		.display {
+			pointer-events: none;
+		}
+
+		#countryName {
+			font-family: 'Mitr', sans-serif;
+			font-size: 1em;
+		}
+	</style>
+</head>
+<body>
+	<!-- Loading Animation -->
+<!-- 	<div id="loader-wrapper">
+		<div id="loader"></div>
+
+		<div class="loader-section section-left"></div>
+		<div class="loader-section section-right"></div>
+	</div> -->
+
+	<header>
+		<!-- <img src="bitcoinIcon.png" alt="BitCoin Icon" width="25" height="25"> -->
+		<nav>
+			<ul>
+				<li><a href="#map">Map</a></li>
+				<li><a href="#info">Info</a></li>
+				<li><a href="doc.html">Doc</a></li>
+			</ul>
+		</nav>
+	</header>
+
+
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+ 	<!-- D3 -->
+ 	<script src="https://d3js.org/d3.v3.min.js"></script>
+ 	<!-- TopoJSON -->
+ 	<script src="http://d3js.org/topojson.v1.min.js"></script>
+ 	<!-- Custom JavaScript -->
+ 	<script src="script.js"></script>
+ 	<!--  Drawing the SVG here -->
+ 	<script>
+ 		var width = (document.documentElement.clientWidth)*0.9,
+			height = (document.documentElement.clientHeight)*0.9,
+			active = d3.select(null);
+
+		var projection = d3.geo.mercator()
+			    .scale((width - 1)/2/Math.PI)
+			    .translate([width/2, (height/2) + 125]);
+
+		var zoom = d3.behavior.zoom()
+			.translate([0, 0])
+			.scale(1)
+		    .scaleExtent([1, 10])
+		    .on("zoom", zoomed);
+
+		var path = d3.geo.path()
+			.projection(projection);
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", width)
+			.attr("height", height)
+			.attr("id", "map")
+			.on("click", stopped, true);
+
+
+		svg.append("rect")
+		    .attr("class", "background")
+		    .attr("width", width)
+		    .attr("height", height)
+		    .on("click", reset);
+
+		var g = svg.append("g");
+
+		svg.call(zoom)
+		   .call(zoom.event);
+
+		d3.json("countries.json", function(error, countries) {
+			if (error) throw error;
+
+			console.log(countries);
+
+			g.selectAll(".unit")
+		    	.data(topojson.feature(countries, countries.objects.units).features)
+		  		.enter().append("path")
+		   		.attr("class", function(d) {
+		   			return "unit " + d.id;
+		   		})
+		    	.attr("d", path)
+		    	.on("click", clicked)
+		    	.on("mouseover", function(d) {
+					// var countryID = d.id;
+					// console.log(country);
+					// var countryFull = d.properties.name_long;
+					// console.log(countryFull);
+					// getCurrency(countryID, countryFull);
+					d3.select("#countryName")
+					  .text(d.properties.name_long)
+					  .attr("x", width/2)
+					  .attr("y", (height/2) - 40)   
+					  .attr("text-anchor", "middle")
+					  .style("font-family", "'Mitr', sans-serif")
+					  .style("font-size", "18px");
+					// currencyCircle.style("visibility", "visible");
+					// bitcoinCircle.style("visibility", "visible");
+					// rateInfo.style("visibility", "visible");
+				})
+				.on("mouseout", function(d) {
+					d3.select("#countryName")
+					  .text("");
+					// currencyCircle.style("visibility", "hidden");
+					// bitcoinCircle.style("visibility", "hidden");
+					// rateInfo.style("visibility", "hidden");
+				});
+
+		    g.append("path")
+			    .datum(topojson.mesh(countries, countries.objects.units, function(a, b) { return a !== b; }))
+			    .attr("class", "boundary")
+			    .attr("d", path);
+		});
+
+		svg.append("circle")
+		   .attr("class", "display")
+		   .attr("id", "cCircle");
+		var currencyCircle = d3.select('#cCircle');
+
+		svg.append("circle")
+		   .attr("class", "display")
+		   .attr("id", "bCircle");
+		var bitcoinCircle = d3.select('#bCircle');
+
+		svg.append("text")
+		   .attr("class", "display")
+		   .attr("id", "info");
+		var rateInfo = d3.select('#info');
+
+		svg.append("text")
+		   .text("Join a BitCoin's Journey in Discovering Self Worth")
+		   .attr("x", width/2)
+		   .attr("y", 40)
+		   .attr("text-anchor", "middle")
+		   .attr("id", "title")
+		   .style("font-family", "'Mitr', sans-serif")
+		   .style("font-size", "24px");
+		var title = d3.select('#title');
+
+		svg.append("text")
+		   .attr("id", "countryName");
+		var country = d3.select('#countryName');
+					   
+		
+		function clicked(d) {
+			if (active.node() === this) return reset();
+			active.classed("active", false);
+			active = d3.select(this).classed("active", true);
+
+			var bounds = path.bounds(d),
+				dx = bounds[1][0] - bounds[0][0],
+				dy = bounds[1][1] - bounds[0][1],
+				x = (bounds[0][0] + bounds[1][0]) / 2,
+				y = (bounds[0][1] + bounds[1][1]) / 2,
+				scale = Math.max(1, Math.min(10, 0.9 / Math.max(dx/width, dy/height))),
+				translate = [width/2 - scale*x, height/2 - scale*y];
+
+			svg.transition()
+				.duration(750)
+				.call(zoom.translate(translate).scale(scale).event);
+
+			// currencyCircle.style("visibility", "visible");
+			// bitcoinCircle.style("visibility", "visible");
+			// rateInfo.style("visibility", "visible");
+
+			var countryID = $(this)[0].__data__.id;
+			// console.log(country);
+			var countryFull = $(this)[0].__data__.properties.name_long;
+			// console.log(countryFull);
+			getCurrency(countryID, countryFull);
+		}
+
+		function reset() {
+			active.classed("active", false);
+			active = d3.select(null);
+
+			svg.transition()
+				.duration(750)
+				.call(zoom.translate([0, 0]).scale(1).event);
+			d3.select("#countryName")
+			  .text("");
+			currencyCircle.style("r", "0");
+			bitcoinCircle.style("r", "0");
+			rateInfo.text("");	
+			// currencyCircle.style("visibility", "hidden");
+			// bitcoinCircle.style("visibility", "hidden");
+			// rateInfo.style("visibility", "hidden");
+		}
+
+		function zoomed() {
+			g.style("stroke-width", 1.5/d3.event.scale + "px");
+			g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+		}
+
+		function stopped() {
+			if (d3.event.defaultPrevented) d3.event.stopPropagation();
+		}
+
+		d3.select(self.frameElement).style("height", height + "px");
+ 	</script>
+
+	<p id="info">Just some random stuff to test out here...</p>
+
+ 	<a href="doc" class="documentation">Documentation</a>
+</body>
+</html>

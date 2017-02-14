@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Documententation</title>
+	<link href="https://fonts.googleapis.com/css?family=Mitr" rel="stylesheet">
+	<style>
+		body {
+			text-align: center;
+			font-family: 'Mitr', sans-serif;
+			line-height: 150%;
+		}
+
+		li {
+			list-style-type: none;
+		}
+	</style>
+</head>
+<body>
+	<h1>Documentation</h1>
+		<h2>What I did</h2>
+			<p>My second project is a BitCoin Map. It shows the world map, with clickable countries. When you click on each country or region, a simple display of the exchange rate between 1 BitCoin and the currency of the selected country will pop up.</p>
+		<h2>Why I did it</h2>
+			<p>I was originally hoping to do some stat visualization for Jeremy Lin, or at least sport-related, because that was something I was passionate about. But then, just on a sudden whim, I thought I could try out something related to maps. I was wondering what sort of theme I could associate with regions or countries in order to create a thematic map, then I suddenly thought about the sample class on BitCoins that I took during Candidate Weekend two years ago. Voila! That was it!</p>
+		<h2>How I did it</h2>
+			<p>Although the end result didn't seem to produce much of an amazing effect, this project was much more complicated than my first.</p>
+			<p>First, I had to figure out how to make a map. I considered Leaflet and other JS libraries, but as Craig suggested, I ended up using D3. In order to make a map with D3, I had to get GeoJSON data of the entire world, then convert them into TopoJSON, which is essentially enhanced GeoJSON that D3 can play round with.</p>
+			<p>After completing the map, I had to bind data to each country. I found an API containing live information about the exchange rate between a number of currencies and BitCoin. I set up the map so that, with each click of a country, an AJAX call is triggered for that specific country. After getting the data, I present it by drawing a circle whose area is proportional to the amount of that currency needed to exchange for 1 BitCoin.</p>
+		<h2>Resources leveraged</h2>
+			<p><strong>Google.</strong>Google was still my good friend. With each little detail that I got stuck on, I could just enter the question into Google, and up pops several different solutions.</p>
+			<p>Here are some of the resources that I used for this project:</p>
+			<ul>
+				<li>
+					<p>Mike Bostock's <a href="https://bost.ocks.org/mike/map/">Let's Make a Map</a> in order to learn how to convert a GeoJSON file into TopoJSON while parsing out unnecessary information so that the file size can be reduced.</p>
+				</li>
+				<li>
+					<p>Creating <a href="http://bl.ocks.org/mbostock/8fadc5ac9c2a9e7c5ba2">pan and zoom effects</a> on the page.</p>
+				</li>
+				<li>
+					<p><a href="http://bl.ocks.org/mbostock/9656675">Zoom to bounding box</a> when a region is clicked on.</p>
+				</li>
+				<li>
+					<p>The <a href="https://github.com/d3">GitHub page of D3</a>, to look for changelogs between the different versions of D3 (mainly because Mike Bostock uses version 3 in all of his examples, while the newest version is version 4. I was simply interested in seeing how the versions are different and which one might be better).</p>
+				</li>
+			</ul>
+			<p>I used websites like <a href="http://www.w3schools.com/">w3schools</a> and <a href="https://developer.mozilla.org/en/docs/Web/JavaScript">the Mozilla Developer Network</a> quite often to find simple information about JavaScript.</p>
+		<h2>Major challenges/realizations</h2>
+			<p>This project presented many challenges for me. One major issue I had to resolve was how to bind the BitCoin data that I call through AJAX to each region on the map. The GeoJSON file I have contained data about each country's population, GDP estimate, administrative government, ISO codes, etc. while the <a href="http://www.coindesk.com/api/">BitCoin API</a> contained only information about the currency and the full currency name. Thus it was difficult to map the GeoJSON to the API data, because there were no corresponding parts between them. Originally, I found a JSON file outlining each country's currencies in this format: "ISO-2 code: currency". I therefore tried to access the ISO-2 country codes in the GeoJSON file in order to obtain the correct currency for each country. However, for many sub-regions in the GeoJSON file, there were no ISO-2 codes. Thus, at first I tried to find the full name of the country and map that using <a href="https://restcountries.eu/rest/v1/all">yet another JSON file</a> which contained currency information about each country in order to finally bind each country to its respective BitCoin exchange rate.</p>
+			<p>However, I was far from done. Because Mike Bostock's example of making the map only involved drawing Great Britain and Ireland, he used a more detailed GeoJSON file. If I was to use that to draw the entire world, the file becomes too large so that the zooming and panning transitions become glitchy. In order to solve this problem, I looked through <a href="https://github.com/nvkelso/natural-earth-vector">Natural Earth's GitHub page</a> in order to find files that correspond only to countries, but not their sub-regions. After finding the file, I discovered that more regions contained ISO-2 codes, so I changed my code to map each country by their ISO-2 code to the exchange rate.</p>
+		<h2>Feedback received</h2>
+			<p><b>Most of the feedback I received were UX-based. For instance (in no particular order):</b></p>
+			<ul>
+				<li>
+					<p><i>Make the circle click-through-able.</i></p>
+					<p>A simple CSS pointer-event setting fixed the problem.</p>
+				</li>
+				<li>
+					<p><i>Giving some simple instructions so that when the user first lands on the page, he or she would at least have an idea as to what they could do.</i></p>
+					<p>Working on this...</p>
+				</li>
+				<li>
+					<p><i>Cut off some decimal points so that the numbers are not as confusing.</i></p>
+					<p>I inserted a Math.round manipulation and tweaked it a bit to make it full-proof.</p>
+				</li>
+				<li>
+					<p><i>Some of the countries are not available...</i></p>
+					<p>Yes, I still have to fix that. The problem comes from countries for which I do not have ISO-2 codes. I cannot get the exchange rate without it.</p>
+				</li>
+				<li>
+					<p><i>Make the circle's area proportional to your data, instead of the circle's radius.</i></p>
+					<p>A = &pi; r^2 <br> r = sqrt ( A / &pi; )</p>
+				</li>
+				<li>
+					<p><i>Add loading page to the website.</i></p>
+					<p>I learned how to make a <a href="https://ihatetomatoes.net/create-css3-spinning-preloader/">simple CSS loader</a> and make it <a href="https://ihatetomatoes.net/create-custom-preloading-screen/">fade out</a>.</p>
+				</li>
+			</ul>
+		<h2>Lessons learned</h2>
+			<p>I felt very satisfied immersing myself in wrestling with D3 in order to produce a map. It was quite tough, and there remains many problems to be fixed, but I gained a glimpse of just how powerful a JavaScript library can be. I look forward to playing around with more libraries in the future.</p>
+</body>
+</html>

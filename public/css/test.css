@@ -1,0 +1,61 @@
+body {
+	margin: 0;
+}
+
+/*==== Styling the Navigation ====*/
+header, nav {
+	height: 45px;
+}
+
+header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	margin: auto;
+}
+
+nav {
+	text-align: center;
+}
+
+img {
+	margin: 10px;
+}
+
+ul {
+	list-style-type: none;
+	font-family: 'Mitr', sans-serif;
+	text-align: center;
+	margin: 10px;
+	padding: 0;
+}
+
+li {
+	display: inline;
+	font-weight: 100;
+}
+
+li a, li a:visited {
+	text-align: center;
+	text-decoration: none;
+	color: #ccc;
+	padding: 8px;
+}
+
+li a:hover {
+	color: #0a402b;
+}
+/*================================*/
+
+.documentation {
+	position: fixed;
+	right: 15px;
+	bottom: 10px;
+	color: #ffa500;
+	transition: 0.5s;
+}
+
+.documentation:hover {
+	color: black;
+	font-size: 20px;
+}

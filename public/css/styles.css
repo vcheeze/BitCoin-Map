@@ -1,0 +1,68 @@
+body {
+	margin: 0;
+}
+
+/*==== Styling the Navigation ====*/
+header, nav {
+	height: 45px;
+}
+
+header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	margin: auto;
+}
+
+img {
+	margin: 10px;
+}
+
+ul {
+	list-style-type: none;
+	font-family: 'Mitr', sans-serif;
+	text-align: center;
+	margin: 10px auto;
+	padding: 0;
+}
+
+li {
+	display: inline;
+	font-weight: 100;
+}
+
+li a, li a:visited {
+	text-align: center;
+	text-decoration: none;
+	color: #ccc;
+	padding: 8px;
+}
+
+li a:hover {
+	color: #ffa500;
+	/*#0a402b*/
+}
+
+/* Making sure the anchors do not conflict with fixed header */
+/*.anchor:before {
+	display: block;
+	content: " ";
+	height: 45px;
+	margin-top: -45px;
+	visibility: hidden;
+}*/
+/*================================*/
+
+.documentation {
+	position: fixed;
+	right: 15px;
+	bottom: 10px;
+	font-family: 'Mitr', sans-serif;
+	color: #ffa500;
+	transition: 0.5s;
+}
+
+.documentation:hover {
+	color: black;
+	font-size: 20px;
+}
